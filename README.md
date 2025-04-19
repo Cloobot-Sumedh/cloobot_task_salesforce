@@ -1,58 +1,88 @@
-# Salesforce App
 
-This guide helps Salesforce developers who are new to Visual Studio Code go from zero to a deployed app using Salesforce Extensions for VS Code and Salesforce CLI.
+# Salesforce Metadata Deployment Script
 
-## Part 1: Choosing a Development Model
+This script automates the process of retrieving specific components from a **source Salesforce org** and deploying them to a **target Salesforce org** using the Salesforce CLI (SFDX).
 
-There are two types of developer processes or models supported in Salesforce Extensions for VS Code and Salesforce CLI. These models are explained below. Each model offers pros and cons and is fully supported.
+## Prerequisites
 
-### Package Development Model
+- [Salesforce CLI](https://developer.salesforce.com/tools/sfdxcli) installed
+- Python 3.x installed
+- Active source and target Salesforce developer orgs
+- Security tokens added to the password if necessary
 
-The package development model allows you to create self-contained applications or libraries that are deployed to your org as a single package. These packages are typically developed against source-tracked orgs called scratch orgs. This development model is geared toward a more modern type of software development process that uses org source tracking, source control, and continuous integration and deployment.
+---
 
-If you are starting a new project, we recommend that you consider the package development model. To start developing with this model in Visual Studio Code, see [Package Development Model with VS Code](https://forcedotcom.github.io/salesforcedx-vscode/articles/user-guide/package-development-model). For details about the model, see the [Package Development Model](https://trailhead.salesforce.com/en/content/learn/modules/sfdx_dev_model) Trailhead module.
+## ⚙️ Setup Instructions
 
-If you are developing against scratch orgs, use the command `SFDX: Create Project` (VS Code) or `sfdx force:project:create` (Salesforce CLI)  to create your project. If you used another command, you might want to start over with that command.
+1. **Install Salesforce CLI**  
+   Follow the official guide:  
+   👉 https://developer.salesforce.com/tools/sfdxcli
 
-When working with source-tracked orgs, use the commands `SFDX: Push Source to Org` (VS Code) or `sfdx force:source:push` (Salesforce CLI) and `SFDX: Pull Source from Org` (VS Code) or `sfdx force:source:pull` (Salesforce CLI). Do not use the `Retrieve` and `Deploy` commands with scratch orgs.
+2. **Create a Salesforce Project**
 
-### Org Development Model
+   Open terminal and run:
+   ```bash
+   sfdx force:project:create --projectname YourProjectName
+   cd YourProjectName
+   ```
 
-The org development model allows you to connect directly to a non-source-tracked org (sandbox, Developer Edition (DE) org, Trailhead Playground, or even a production org) to retrieve and deploy code directly. This model is similar to the type of development you have done in the past using tools such as Force.com IDE or MavensMate.
+3. **Place Script in Root Directory**
 
-To start developing with this model in Visual Studio Code, see [Org Development Model with VS Code](https://forcedotcom.github.io/salesforcedx-vscode/articles/user-guide/org-development-model). For details about the model, see the [Org Development Model](https://trailhead.salesforce.com/content/learn/modules/org-development-model) Trailhead module.
+   Copy the `deploy.py` file into the **root directory** of your newly created Salesforce project.
 
-If you are developing against non-source-tracked orgs, use the command `SFDX: Create Project with Manifest` (VS Code) or `sfdx force:project:create --manifest` (Salesforce CLI) to create your project. If you used another command, you might want to start over with this command to create a Salesforce DX project.
+4. **Update Credentials**
 
-When working with non-source-tracked orgs, use the commands `SFDX: Deploy Source to Org` (VS Code) or `sfdx force:source:deploy` (Salesforce CLI) and `SFDX: Retrieve Source from Org` (VS Code) or `sfdx force:source:retrieve` (Salesforce CLI). The `Push` and `Pull` commands work only on orgs with source tracking (scratch orgs).
+   In `deploy.py`, modify the `SOURCE_CREDS` and `TARGET_CREDS` dictionary with your Salesforce org credentials:
+   ```python
+   SOURCE_CREDS = {
+       "username": "your_source_username",
+       "password": "your_source_password",
+       "security_token": "your security token",
+       "alias": "source_org"
+   }
 
-## The `sfdx-project.json` File
+   TARGET_CREDS = {
+       "username": "your_target_username",
+       "password": "your_target_password",
+       "security_token": "your security token",
+       "alias": "target_org"
+   }
+   ```
+   also PUT usernames IN deploy_process() function at place of source_org and target_org respectively
+5. **Assign Components to Deploy**
 
-The `sfdx-project.json` file contains useful configuration information for your project. See [Salesforce DX Project Configuration](https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_ws_config.htm) in the _Salesforce DX Developer Guide_ for details about this file.
+   Update the `COMPONENTS` dictionary to define which flows, Apex classes, or metadata you want to transfer:
+   ```python
+   COMPONENTS = {
+       "flows": ["Your_Flow_Name"],
+       "apex_classes": ["YourApexClass"],
+       "custom_metadata": ["Your_Metadata_Object"]
+   }
+   ```
 
-The most important parts of this file for getting started are the `sfdcLoginUrl` and `packageDirectories` properties.
+---
 
-The `sfdcLoginUrl` specifies the default login URL to use when authorizing an org.
+## 🚀 Running the Script
 
-The `packageDirectories` filepath tells VS Code and Salesforce CLI where the metadata files for your project are stored. You need at least one package directory set in your file. The default setting is shown below. If you set the value of the `packageDirectories` property called `path` to `force-app`, by default your metadata goes in the `force-app` directory. If you want to change that directory to something like `src`, simply change the `path` value and make sure the directory you’re pointing to exists.
+Simply run the script:
 
-```json
-"packageDirectories" : [
-    {
-      "path": "force-app",
-      "default": true
-    }
-]
+```bash
+python3 deploy.py
 ```
 
-## Part 2: Working with Source
+---
 
-For details about developing against scratch orgs, see the [Package Development Model](https://trailhead.salesforce.com/en/content/learn/modules/sfdx_dev_model) module on Trailhead or [Package Development Model with VS Code](https://forcedotcom.github.io/salesforcedx-vscode/articles/user-guide/package-development-model).
+## 🧠 What Happens
 
-For details about developing against orgs that don’t have source tracking, see the [Org Development Model](https://trailhead.salesforce.com/content/learn/modules/org-development-model) module on Trailhead or [Org Development Model with VS Code](https://forcedotcom.github.io/salesforcedx-vscode/articles/user-guide/org-development-model).
+- Authenticates to **source** and **target** orgs
+- Retrieves specified components from the **source org**
+- Validates and deploys them to the **target org**
+- Verifies deployment success with SOQL queries
+- Extracted components will appear in:
+  ```
+  ./force-app/main/default
+  ```
+- Target org will reflect all deployed components
 
-## Part 3: Deploying to Production
+---
 
-Don’t deploy your code to production directly from Visual Studio Code. The deploy and retrieve commands do not support transactional operations, which means that a deployment can fail in a partial state. Also, the deploy and retrieve commands don’t run the tests needed for production deployments. The push and pull commands are disabled for orgs that don’t have source tracking, including production orgs.
-
-Deploy your changes to production using [packaging](https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_dev2gp.htm) or by [converting your source](https://developer.salesforce.com/docs/atlas.en-us.sfdx_cli_reference.meta/sfdx_cli_reference/cli_reference_force_source.htm#cli_reference_convert) into metadata format and using the [metadata deploy command](https://developer.salesforce.com/docs/atlas.en-us.sfdx_cli_reference.meta/sfdx_cli_reference/cli_reference_force_mdapi.htm#cli_reference_deploy).
