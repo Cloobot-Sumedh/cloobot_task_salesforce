@@ -11,14 +11,14 @@ from getpass import getpass
 # Configuration
 CREDENTIALS = {
     "source": {
-        "username": "sumedhdeshkar825@agentforce.com",
-        "password": "Bharat@2002",
-        "security_token": "qxclDKJVvdpgsbvEw76hzBsJ6"
+        "username": "your_user_name",
+        "password": "Password",
+        "security_token": "security token"
     },
     "target": {
-        "username": "sumedh867@agentforce.com",
-        "password": "Bharat@2002",
-        "security_token": "DPT7OUXnCpeNHrDkvnfRhnqgf"
+        "username": "your_user_name",
+        "password": "Password",
+        "security_token": "security token"
     }
 }
 
